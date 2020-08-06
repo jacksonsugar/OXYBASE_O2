@@ -33,6 +33,9 @@ while(1):
 	print('0. Type your own command')
 
 	func = raw_input('-')
+	
+	ser.flushInput()
+	ser.flushOutput()
 
 	if func == '1':
 
