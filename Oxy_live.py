@@ -6,6 +6,7 @@ import serial
 
 reply = ''
 
+# Begin Serial coms
 ser= serial.Serial(
     port='/dev/ttyUSB0', #serial port the object should read
     baudrate= 19200,      #rate at which information is transfered over comm channel
@@ -26,13 +27,13 @@ y2 = []
 ser.write(b'mode0001\r')
 
 timestr = str(time.strftime("%Y%m-%d_%H-%M-%S"))
-
+# File location is in same directory as code, change as needed
 file_name = "./OXYBASE" + timestr
 
 file = open(file_name,"a+")
 
 file.write(file_name + "\r\n")
-
+# Time strings must incriment with data read cycle and be unique or else data will not plot
 start_time = dt.datetime.now().strftime('%H:%M:%S.%f')
 
 # This function is called periodically from FuncAnimation
@@ -41,7 +42,7 @@ def animate(i, xs, ys, y2):
     ser.flushInput()
     ser.flushOutput()
 
-    # Read data
+    # Read new data
     ser.write(b'data\r')
 
     reply = ser.read_until('\r')
@@ -72,7 +73,7 @@ def animate(i, xs, ys, y2):
     ys.append(oxy)
     y2.append(temp)
 
-    # Limit x and y lists to 200 items
+    # Limit x and y lists to 200 items (This is about the sweet spot without overloading my laptop)
     xs = xs[-200:]
     ys = ys[-200:]
     y2 = y2[-200:]
@@ -92,8 +93,3 @@ def animate(i, xs, ys, y2):
 
 ani = animation.FuncAnimation(fig, animate, fargs=(xs, ys, y2), interval=500)
 plt.show()
-
-ser.write(b'mode0000\r')
-
-ser.flushInput()
-ser.flushOutput()
