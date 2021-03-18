@@ -5,6 +5,18 @@ reply = ''
 
 i = 1
 
+def yes_no(answer):
+    yes = set(['yes','y', 'ye', 'yeet', ''])
+    no = set(['no','n'])
+
+    while True:
+        choice = raw_input(answer).lower()
+        if choice in yes:
+            return True
+        elif choice in no:
+            return False
+        else:
+            print("Please respond with 'yes' or 'no'\n")
 
 ser= serial.Serial(
 	port='/dev/ttyUSB0', #serial port the object should read
@@ -112,17 +124,29 @@ while(1):
 
 	elif func == '9':
 
-		cmd = int(raw_input('Please input number of samples:'))
+		cmd = int(raw_input('Please input number of samples:  '))
+
+        log = yes_no('Would you like to log the data to a local file? [Y/N] : ')
+
+        if log == True:
+
+            for dataNum in os.listdir('.'):
+                if dataNum.endswith('_OXYTest.txt'):
+                    samp_count = samp_count + 1
+
+            file_name = "./{}_OXYTest.txt".format(samp_count)
+
+            file = open(file_name,"a+")
+
+            file.write("{}\r\n".format(file_name))
+
+            file.write("OXYBASE RS232 @ 1 Hz \n")
+
+            timestr = str(time.strftime("%Y%m-%d_%H-%M-%S \n"))
+
+            file.write(timestr)
 
 		ser.write(b'mode0001\r')
-
-		timestr = str(time.strftime("%Y%m-%d_%H-%M-%S"))
-
-		file_name = "./OXYBASE" + timestr
-
-		file = open(file_name,"a+")
-
-		file.write(file_name + "\r\n")
 
 		while(i <= cmd):
 
@@ -132,7 +156,9 @@ while(1):
 
 			reply = '\n' + reply
 
-			file.write(reply)
+            if log == True:
+
+                file.write(reply)
 
 			print(reply)
 
